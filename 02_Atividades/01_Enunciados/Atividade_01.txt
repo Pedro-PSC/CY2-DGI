@@ -1,0 +1,7 @@
+Escreva um texto sobre você, uma mini biografia usando um arquivo HTML, onde você vai usar todas as TAGs aprendidas na aula de hoje
+
+<h1> até <h6> → Heading | Cabeçalhi
+<p> → Paragraph | Parágrafo
+<b> → Bold | Negrito
+<i> → Italic | Italico
+<u> → underline | Sublinhado
