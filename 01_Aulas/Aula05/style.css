@@ -1,0 +1,42 @@
+/* Assim que faz comentários em CSS */
+
+/*Identificador → id '#' (Ideal o idenficador não repetir em outras tags)*/
+#textoExemplo
+{
+    color: #FF7F00;
+    font-size: 1.2em;
+}
+
+/*Elementos → tags (Todas as TAGS citadas no html serão todas modificadas não importa se estão dentro de outra tag)*/
+h1,h2,h3
+{
+    font-family: 'Times New Roman', Times, serif;
+}
+
+/*Classe* → class '.' (Ideal usar em tags que vão receber a mesma modificação)*/
+.italicoLinha
+{
+    font-style: italic;
+    color: green;
+}
+
+#idUm
+{
+    background: lightblue;
+    width: 150px;
+}
+#idDois
+{
+    background: yellow;
+    width: 200px;
+}
+#idTres
+{
+    background: lightgreen;
+    width: 250px;
+}
+#idQuatro
+{
+    background: lightcoral;
+    width: 300px;
+}
