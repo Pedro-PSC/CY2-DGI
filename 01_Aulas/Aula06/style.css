@@ -1,0 +1,36 @@
+/*Combinadores → são uma forma de controlocar melhor o ascesso de múltiplas TAGs*/
+
+/* Descendentes (ESPAÇO)*/
+table h2{
+    color: orange;
+}
+
+/*Filhos (>)*/
+div > p{
+    background-color: lightblue;
+}
+
+/*Irmão Adjacente (+)*/
+#ProximoParagrafo + p{
+    font-size: 1.5em;
+}
+
+/* Irmão Geral (~)*/
+#brother ~ p{
+    background-color: lightgreen;
+}
+
+/*Pseudo-Class (:)*/
+img:hover{
+    border-radius: 20px;
+    filter: sepia(30%);
+}
+
+img{
+width: 70%;
+}
+
+/*Psudo-Elemento (::)*/
+#PrimeiraLetra::first-letter{
+    font-size: 4em;
+}

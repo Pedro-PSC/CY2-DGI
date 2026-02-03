@@ -1,0 +1,87 @@
+#box{
+    width: 200px;
+    height: 200px;
+    background: lightblue;
+    padding: 1px 15px;
+    border-radius: 20px;
+    box-sizing: border-box;
+}
+
+#box2{
+    width: 300px;
+    height:200px;
+    background-image: url("../Aula07/img/mina.avif");
+    color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    background-size: 100% 100%;
+    box-shadow: 5px -10px 5px 3px rgba(204, 19, 19, 0.612),
+    -5px 10px 5px 3px rgba(35, 38, 165, 0.757)
+    ;
+    
+}
+
+#box3{
+    width: 500px;
+    height: 500px;
+    background-image: url("..//Aula07/img/billie.png");
+    background-size: 100% 100%;
+    color: black;
+}
+
+#box3 h1{
+    background: linear-gradient(to right, pink, yellow, brown);
+    padding: 2px 5px;
+    box-sizing: border-box;
+    border-bottom: 2px solid white;
+}
+
+#box4{
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(red, 30% , black);
+    border-radius: 0%;
+}
+
+#box5{
+    width: 200px;
+    height: 200px;
+    background: lightblue;
+    padding: 1px 15px;
+    border-radius: 20px;
+    box-sizing: border-box;
+    position: relative;
+    animation: anim_box 5s 2s infinite alternate;
+}
+
+@keyframes anim_box{
+    from{
+        background: lightblue;
+        border-radius: 20px;
+        top: 0px;
+        left: 0px;
+    }
+    to{
+        background: lightsalmon;
+        border-radius: 80px;
+        top: 100px;
+        left: 800px;
+    }
+}
+
+#box6{
+    width: 300px;
+    height: 300px;
+    background-color: orange;
+    padding: 1px 15px;
+    border-radius: 20px;
+    box-sizing: border-box;
+    transition: all 0.3s;
+}
+
+#box6:hover{
+    width: 500px;
+    background-color: blue;
+    color: white;
+    transition: all 0.3s;
+}

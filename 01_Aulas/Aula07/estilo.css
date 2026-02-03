@@ -1,0 +1,28 @@
+.topnav{
+    overflow: hidden;
+    background-color: orange;
+}
+
+.topnav a{
+    float: left;
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.topnav a:hover{
+    background-color: #ddd;
+    color: #585858;
+}
+
+.column{
+    float: left;
+    width: 25%;
+}
+
+@media screen and (max-width: 600px){
+    .column{
+        width: 100%;
+    }
+}

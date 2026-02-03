@@ -1,0 +1,28 @@
+/*
+Expressões regulares é um uso de padrão de ecrita que tem no seu HTML que você para encontrar aonde o CSS deve estilizar.
+
+elemento [atributo OPERADOR valor]{
+    intruções CSS
+    ...
+}
+
+OPERADOR |     SIGNIFICADO    |      SELECIONA ELEMENTOS COM ATRIBUTO
+---------|--------------------|-----------------------------------------------------
+=        | Exatamento igual a | coincidente exatamente com o valor especificado
+^=       | Inicia com         | cuja parte inicial coincide com o valor especificado
+$=       | Termina com        | cuja parte final coincide com o valor especificado
+*=       | Contém             | que contém o valor especificado em qualuer posição
+---------|--------------------|------------------------------------------------------ 
+*/
+
+img[src = "img/mina.avif"]{
+    border-radius: 20px;
+}
+
+img[src ^= "img/"]{
+    width: 70%;
+}
+
+img[src $= ".png"]{
+    filter: grayscale(70%);
+}

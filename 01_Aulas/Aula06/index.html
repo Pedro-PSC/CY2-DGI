@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações Especiais</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!--Descendentes-->
+    <table>
+        <tr>
+            <th><h2>Eletrônicos</h2></th>
+        </tr>
+        <tr>
+            <td>Computador</td>
+        </tr>
+        <tr>
+            <td>Celular</td>
+        </tr>
+    </table>
+
+    <hr>
+    <!--Filho-->
+    <div>
+        <p>Parágrafo 1 no div</p>
+        <p>Parágrafo 2 no div</p>
+        <span>
+            <p>Parágrafo 3 no div</p>
+        </span>
+        <!-- <p> Não é Filho, apenas um descendente-->
+    </div>
+    <p>Parágrafo 4 não está no div</p>
+    <p>Parágrafo 5 não está no div</p>
+
+    <hr>
+    <!--Irmão Adjacente-->
+    <p>Texto</p>
+    <br id="ProximoParagrafo">
+    <p>Texto 2</p>
+    <p>Texto 3</p>
+
+    <hr>
+    <!--Irmão Geral-->
+    <p>Parágrafo 1</p>
+    <div id="brother">
+        <code>Código...</code>
+         <p>Parágrafo 2</p>
+    </div>
+    <p>Parágrafo 3</p>
+    <code>Código...</code>
+    <p>Parágrafo 4</p>
+
+    <hr>
+    <!--Pseudo-Classe-->
+        <img src="mina.avif">
+    
+    <hr>
+    <!--Pseudo-Elemento-->
+    <p id="PrimeiraLetra">
+        Esté é um parágrafo teste para o Pseudo-Elemento de deixar a primeira letra maior como nos livros de fantasia
+    </p>
+</body>
+</html>
