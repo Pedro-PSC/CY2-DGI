@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Personagem D&D 5e</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="character-sheet">
+        <h1>Ficha de Personagem</h1>
+
+        <div class="grid-container">
+            <!-- Coluna Esquerda (mais larga) -->
+            <div class="left-column">
+                <!-- Seção Identidade -->
+                <div class="section">
+                    <div class="section-title">Identidade</div>
+                    <div class="inline-fields">
+                        <div class="field">
+                            <label>Raça</label>
+                            <select id="race" onchange="updateRaceBonuses(); autoSave()">
+                                <option value="">Selecione</option>
+                                <optgroup label="Anão">
+                                    <option value="dwarf-hill">Anão da Colina</option>
+                                    <option value="dwarf-mountain">Anão da Montanha</option>
+                                </optgroup>
+                                <optgroup label="Elfo">
+                                    <option value="elf-high">Alto Elfo</option>
+                                    <option value="elf-wood">Elfo da Floresta</option>
+                                    <option value="elf-dark">Elfo Negro (Drow)</option>
+                                </optgroup>
+                                <optgroup label="Halfling">
+                                    <option value="halfling-lightfoot">Pés-Leves</option>
+                                    <option value="halfling-stout">Robusto</option>
+                                </optgroup>
+                                <option value="human">Humano</option>
+                                <option value="dragonborn">Draconato</option>
+                                <optgroup label="Gnomo">
+                                    <option value="gnome-forest">Gnomo da Floresta</option>
+                                    <option value="gnome-rock">Gnomo das Rochas</option>
+                                </optgroup>
+                                <option value="half-elf">Meio-Elfo</option>
+                                <option value="half-orc">Meio-Orc</option>
+                                <option value="tiefling">Tiefling</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Classe</label>
+                            <select id="class" onchange="updateClassFeatures(); autoSave()">
+                                <option value="">Selecione</option>
+                                <option value="barbarian">Bárbaro</option>
+                                <option value="bard">Bardo</option>
+                                <option value="cleric">Clérigo</option>
+                                <option value="druid">Druida</option>
+                                <option value="fighter">Guerreiro</option>
+                                <option value="monk">Monge</option>
+                                <option value="paladin">Paladino</option>
+                                <option value="ranger">Patrulheiro</option>
+                                <option value="rogue">Ladino</option>
+                                <option value="sorcerer">Feiticeiro</option>
+                                <option value="warlock">Bruxo</option>
+                                <option value="wizard">Mago</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Subclasse</label>
+                            <select id="subclass" onchange="autoSave()">
+                                <option value="">Selecione</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Nível</label>
+                            <input type="number" id="level" min="1" max="20" value="1" onchange="updateProficiencyBonus(); updateHP(); autoSave()">
+                        </div>
+                        <div class="field">
+                            <label>Nome</label>
+                            <input type="text" id="character-name" placeholder="Nome do Personagem" onchange="autoSave()">
+                        </div>
+                        <div class="field">
+                            <label>Jogador</label>
+                            <input type="text" id="player-name" placeholder="Seu Nome" onchange="autoSave()">
+                        </div>
+                        <div class="field">
+                            <label>Antecedente</label>
+                            <select id="background" onchange="autoSave()">
+                                <option value="">Selecione</option>
+                                <option value="acolyte">Acólito</option>
+                                <option value="charlatan">Charlatão</option>
+                                <option value="criminal">Criminoso</option>
+                                <option value="entertainer">Artista</option>
+                                <option value="folk-hero">Herói do Povo</option>
+                                <option value="guild-artisan">Artesão de Guilda</option>
+                                <option value="hermit">Eremita</option>
+                                <option value="noble">Nobre</option>
+                                <option value="outlander">Forasteiro</option>
+                                <option value="sage">Sábio</option>
+                                <option value="sailor">Marinheiro</option>
+                                <option value="soldier">Soldado</option>
+                                <option value="urchin">Órfão</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Tendência</label>
+                            <select id="alignment" onchange="autoSave()">
+                                <option value="">Selecione</option>
+                                <option value="lg">Leal e Bom</option>
+                                <option value="ng">Neutro e Bom</option>
+                                <option value="cg">Caótico e Bom</option>
+                                <option value="ln">Leal e Neutro</option>
+                                <option value="n">Neutro</option>
+                                <option value="cn">Caótico e Neutro</option>
+                                <option value="le">Leal e Mau</option>
+                                <option value="ne">Neutro e Mau</option>
+                                <option value="ce">Caótico e Mau</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>XP</label>
+                            <input type="number" id="xp" value="0" min="0" onchange="autoSave()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Atributos -->
+                <div class="section">
+                    <div class="section-title">Habilidades</div>
+                    <div class="abilities-grid">
+                        <div class="ability-card">
+                            <div class="ability-name">Força</div>
+                            <div class="ability-controls">
+                                <button class="ability-btn minus" onclick="adjustAbility('str', -1); autoSave()">-</button>
+                                <input type="number" class="ability-score" id="str-score" value="10" min="1" max="30" onchange="calculateModifier('str'); updateHP(); autoSave()">
+                                <button class="ability-btn plus" onclick="adjustAbility('str', 1); autoSave()">+</button>
+                            </div>
+                            <div class="ability-mod" id="str-mod">+0</div>
+                        </div>
+                        <div class="ability-card">
+                            <div class="ability-name">Destreza</div>
+                            <div class="ability-controls">
+                                <button class="ability-btn minus" onclick="adjustAbility('dex', -1); autoSave()">-</button>
+                                <input type="number" class="ability-score" id="dex-score" value="10" min="1" max="30" onchange="calculateModifier('dex'); autoSave()">
+                                <button class="ability-btn plus" onclick="adjustAbility('dex', 1); autoSave()">+</button>
+                            </div>
+                            <div class="ability-mod" id="dex-mod">+0</div>
+                        </div>
+                        <div class="ability-card">
+                            <div class="ability-name">Constituição</div>
+                            <div class="ability-controls">
+                                <button class="ability-btn minus" onclick="adjustAbility('con', -1); autoSave()">-</button>
+                                <input type="number" class="ability-score" id="con-score" value="10" min="1" max="30" onchange="calculateModifier('con'); updateHP(); autoSave()">
+                                <button class="ability-btn plus" onclick="adjustAbility('con', 1); autoSave()">+</button>
+                            </div>
+                            <div class="ability-mod" id="con-mod">+0</div>
+                        </div>
+                        <div class="ability-card">
+                            <div class="ability-name">Inteligência</div>
+                            <div class="ability-controls">
+                                <button class="ability-btn minus" onclick="adjustAbility('int', -1); autoSave()">-</button>
+                                <input type="number" class="ability-score" id="int-score" value="10" min="1" max="30" onchange="calculateModifier('int'); autoSave()">
+                                <button class="ability-btn plus" onclick="adjustAbility('int', 1); autoSave()">+</button>
+                            </div>
+                            <div class="ability-mod" id="int-mod">+0</div>
+                        </div>
+                        <div class="ability-card">
+                            <div class="ability-name">Sabedoria</div>
+                            <div class="ability-controls">
+                                <button class="ability-btn minus" onclick="adjustAbility('wis', -1); autoSave()">-</button>
+                                <input type="number" class="ability-score" id="wis-score" value="10" min="1" max="30" onchange="calculateModifier('wis'); autoSave()">
+                                <button class="ability-btn plus" onclick="adjustAbility('wis', 1); autoSave()">+</button>
+                            </div>
+                            <div class="ability-mod" id="wis-mod">+0</div>
+                        </div>
+                        <div class="ability-card">
+                            <div class="ability-name">Carisma</div>
+                            <div class="ability-controls">
+                                <button class="ability-btn minus" onclick="adjustAbility('cha', -1); autoSave()">-</button>
+                                <input type="number" class="ability-score" id="cha-score" value="10" min="1" max="30" onchange="calculateModifier('cha'); autoSave()">
+                                <button class="ability-btn plus" onclick="adjustAbility('cha', 1); autoSave()">+</button>
+                            </div>
+                            <div class="ability-mod" id="cha-mod">+0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Perícias -->
+                <div class="section">
+                    <div class="section-title">Perícias</div>
+                    <div class="skills-grid" id="skills-container">
+                        <!-- Preenchido via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Combate -->
+                <div class="section">
+                    <div class="section-title">Combate</div>
+                    <div class="combat-stats">
+                        <div class="combat-field">
+                            <label>CA</label>
+                            <div class="combat-controls">
+                                <button class="combat-btn minus" onclick="adjustCombat('ac', -1); autoSave()">-</button>
+                                <input type="number" id="ac" value="10" min="0" onchange="autoSave()">
+                                <button class="combat-btn plus" onclick="adjustCombat('ac', 1); autoSave()">+</button>
+                            </div>
+                        </div>
+                        <div class="combat-field">
+                            <label>Iniciativa</label>
+                            <input type="number" id="initiative" value="0" readonly>
+                        </div>
+                        <div class="combat-field">
+                            <label>Deslocamento</label>
+                            <div class="combat-controls">
+                                <button class="combat-btn minus" onclick="adjustCombat('speed', -0.5); autoSave()">-</button>
+                                <input type="number" id="speed" value="9" step="0.5" min="0" onchange="autoSave()">
+                                <button class="combat-btn plus" onclick="adjustCombat('speed', 0.5); autoSave()">+</button>
+                            </div>
+                        </div>
+                        <div class="combat-field">
+                            <label>PV Máx</label>
+                            <div class="combat-controls">
+                                <button class="combat-btn minus" onclick="adjustCombat('hp-max', -1); autoSave()">-</button>
+                                <input type="text" id="hp-max" value="10" onchange="autoSave()">
+                                <button class="combat-btn plus" onclick="adjustCombat('hp-max', 1); autoSave()">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Container para PVs com botões empilhados -->
+                    <div class="hp-container">
+                        <div class="field">
+                            <label>PV Atuais</label>
+                            <div class="stacked-controls">
+                                <input type="number" id="hp-current" value="10" min="0" onchange="autoSave()">
+                                <div class="stacked-buttons">
+                                    <button class="stacked-btn" onclick="adjustStacked('hp-current', 1); autoSave()">+</button>
+                                    <button class="stacked-btn" onclick="adjustStacked('hp-current', -1); autoSave()">-</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>PV Temporários</label>
+                            <div class="stacked-controls">
+                                <input type="number" id="hp-temp" value="0" min="0" onchange="autoSave()">
+                                <div class="stacked-buttons">
+                                    <button class="stacked-btn" onclick="adjustStacked('hp-temp', 1); autoSave()">+</button>
+                                    <button class="stacked-btn" onclick="adjustStacked('hp-temp', -1); autoSave()">-</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Dados de Vida</label>
+                            <input type="text" id="hit-dice" value="1d10" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="death-saves">
+                        <div class="death-saves-group">
+                            <span>Sucessos:</span>
+                            <div class="death-save-item">
+                                <input type="checkbox" id="death-success-1" onchange="autoSave()"> 
+                                <input type="checkbox" id="death-success-2" onchange="autoSave()"> 
+                                <input type="checkbox" id="death-success-3" onchange="autoSave()">
+                            </div>
+                        </div>
+                        <div class="death-saves-group">
+                            <span>Fracassos:</span>
+                            <div class="death-save-item">
+                                <input type="checkbox" id="death-fail-1" onchange="autoSave()"> 
+                                <input type="checkbox" id="death-fail-2" onchange="autoSave()"> 
+                                <input type="checkbox" id="death-fail-3" onchange="autoSave()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ataques -->
+                <div class="section">
+                    <div class="section-title">Ataques e Magias</div>
+                    <div class="attacks-grid">
+                        <div class="attacks-header">Nome</div>
+                        <div class="attacks-header">Bônus</div>
+                        <div class="attacks-header">Dano/Tipo</div>
+                        <div class="attacks-header">Alcance</div>
+                        <div class="attacks-header">Usado</div>
+                        
+                        <div class="attacks-row">
+                            <input type="text" id="attack1-name" placeholder="Ex: Espada Longa" onchange="autoSave()">
+                            <input type="text" id="attack1-bonus" value="+5" placeholder="+5" onchange="autoSave()">
+                            <input type="text" id="attack1-damage" value="1d8+3" placeholder="1d8+3" onchange="autoSave()">
+                            <input type="text" id="attack1-range" value="1.5m" placeholder="1.5m" onchange="autoSave()">
+                            <input type="checkbox" id="attack1-used" onchange="autoSave()">
+                        </div>
+                        <div class="attacks-row">
+                            <input type="text" id="attack2-name" placeholder="Ex: Arco Longo" onchange="autoSave()">
+                            <input type="text" id="attack2-bonus" value="+5" placeholder="+5" onchange="autoSave()">
+                            <input type="text" id="attack2-damage" value="1d8+3" placeholder="1d8+3" onchange="autoSave()">
+                            <input type="text" id="attack2-range" value="45/180m" placeholder="45/180m" onchange="autoSave()">
+                            <input type="checkbox" id="attack2-used" onchange="autoSave()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Equipamento -->
+                <div class="section">
+                    <div class="section-title">Equipamento</div>
+                    <textarea id="equipment" class="fixed-textarea" rows="4" placeholder="Liste seu equipamento..." onchange="autoSave()"></textarea>
+                    
+                    <!-- Campos de dinheiro em linha única -->
+                    <div class="money-fields">
+                        <div class="field">
+                            <label>PC</label>
+                            <div class="stacked-controls">
+                                <input type="number" id="cp" value="0" min="0" onchange="autoSave()">
+                                <div class="stacked-buttons">
+                                    <button class="stacked-btn" onclick="adjustStacked('cp', 1); autoSave()">+</button>
+                                    <button class="stacked-btn" onclick="adjustStacked('cp', -1); autoSave()">-</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>PP</label>
+                            <div class="stacked-controls">
+                                <input type="number" id="sp" value="0" min="0" onchange="autoSave()">
+                                <div class="stacked-buttons">
+                                    <button class="stacked-btn" onclick="adjustStacked('sp', 1); autoSave()">+</button>
+                                    <button class="stacked-btn" onclick="adjustStacked('sp', -1); autoSave()">-</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>PE</label>
+                            <div class="stacked-controls">
+                                <input type="number" id="ep" value="0" min="0" onchange="autoSave()">
+                                <div class="stacked-buttons">
+                                    <button class="stacked-btn" onclick="adjustStacked('ep', 1); autoSave()">+</button>
+                                    <button class="stacked-btn" onclick="adjustStacked('ep', -1); autoSave()">-</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>PO</label>
+                            <div class="stacked-controls">
+                                <input type="number" id="gp" value="0" min="0" onchange="autoSave()">
+                                <div class="stacked-buttons">
+                                    <button class="stacked-btn" onclick="adjustStacked('gp', 1); autoSave()">+</button>
+                                    <button class="stacked-btn" onclick="adjustStacked('gp', -1); autoSave()">-</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>PL</label>
+                            <div class="stacked-controls">
+                                <input type="number" id="pp" value="0" min="0" onchange="autoSave()">
+                                <div class="stacked-buttons">
+                                    <button class="stacked-btn" onclick="adjustStacked('pp', 1); autoSave()">+</button>
+                                    <button class="stacked-btn" onclick="adjustStacked('pp', -1); autoSave()">-</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna Direita (mais estreita) -->
+            <div class="right-column">
+                <!-- Retrato -->
+                <div class="section">
+                    <div class="section-title">Retrato do Personagem</div>
+                    <div class="portrait-container">
+                        <div class="portrait-placeholder" id="portrait-placeholder" onclick="document.getElementById('portrait-upload').click()">
+                            <span>Clique para adicionar imagem</span>
+                            <input type="file" id="portrait-upload" accept="image/*" style="display: none;" onchange="loadPortrait(event); autoSave()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testes de Resistência -->
+                <div class="section">
+                    <div class="section-title">Testes de Resistência</div>
+                    <div class="saving-throws">
+                        <div class="saving-item">
+                            <input type="checkbox" id="prof-str" onchange="updateSavingThrows(); autoSave()">
+                            <span>Força <span id="save-str">+0</span></span>
+                        </div>
+                        <div class="saving-item">
+                            <input type="checkbox" id="prof-dex" onchange="updateSavingThrows(); autoSave()">
+                            <span>Destreza <span id="save-dex">+0</span></span>
+                        </div>
+                        <div class="saving-item">
+                            <input type="checkbox" id="prof-con" onchange="updateSavingThrows(); autoSave()">
+                            <span>Constituição <span id="save-con">+0</span></span>
+                        </div>
+                        <div class="saving-item">
+                            <input type="checkbox" id="prof-int" onchange="updateSavingThrows(); autoSave()">
+                            <span>Inteligência <span id="save-int">+0</span></span>
+                        </div>
+                        <div class="saving-item">
+                            <input type="checkbox" id="prof-wis" onchange="updateSavingThrows(); autoSave()">
+                            <span>Sabedoria <span id="save-wis">+0</span></span>
+                        </div>
+                        <div class="saving-item">
+                            <input type="checkbox" id="prof-cha" onchange="updateSavingThrows(); autoSave()">
+                            <span>Carisma <span id="save-cha">+0</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estatísticas Passivas -->
+                <div class="section">
+                    <div class="section-title">Percepção Passiva</div>
+                    <div class="passive-perception" id="passive-perception">
+                        10
+                    </div>
+                    <div class="inline-fields centered" style="margin-top: 15px;">
+                        <div class="inspiration-field">
+                            <label>Inspiração</label>
+                            <input type="checkbox" id="inspiration" onchange="autoSave()">
+                        </div>
+                        <div class="proficiency-field">
+                            <label>Bônus de Proficiência</label>
+                            <input type="number" id="prof-bonus" value="2" min="2" max="6" step="1" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Idiomas e Proficiências -->
+                <div class="section">
+                    <div class="section-title">Idiomas e Outras Proficiências</div>
+                    <textarea id="languages" class="fixed-textarea" rows="3" placeholder="Comum, Anão, Ferramentas de Ferreiro..." onchange="autoSave()"></textarea>
+                </div>
+
+                <!-- Características e Habilidades -->
+                <div class="section">
+                    <div class="section-title">Características e Habilidades</div>
+                    <textarea id="features" class="fixed-textarea" rows="4" placeholder="Traços raciais, características de classe..." onchange="autoSave()"></textarea>
+                </div>
+
+                <!-- Personalidade -->
+                <div class="section">
+                    <div class="section-title">Traços de Personalidade</div>
+                    <textarea id="personality-traits" class="fixed-textarea" rows="2" placeholder="Descreva os traços..." onchange="autoSave()"></textarea>
+                    
+                    <div class="section-title" style="margin-top: 15px;">Ideais</div>
+                    <textarea id="ideals" class="fixed-textarea" rows="2" placeholder="Seus ideais..." onchange="autoSave()"></textarea>
+                    
+                    <div class="section-title" style="margin-top: 15px;">Ligações</div>
+                    <textarea id="bonds" class="fixed-textarea" rows="2" placeholder="Suas ligações..." onchange="autoSave()"></textarea>
+                    
+                    <div class="section-title" style="margin-top: 15px;">Defeitos</div>
+                    <textarea id="flaws" class="fixed-textarea" rows="2" placeholder="Seus defeitos..." onchange="autoSave()"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rodapé com botões Salvar e Carregar -->
+        <div class="footer">
+            <button onclick="saveCharacter()" class="save-btn">💾 Salvar</button>
+            <button onclick="loadCharacter()" class="load-btn">📂 Carregar</button>
+            <input type="file" id="load-file" accept=".json" style="display: none;" onchange="loadFromFile(event)">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
