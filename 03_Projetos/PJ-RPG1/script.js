@@ -211,6 +211,102 @@ function calculateAllModifiers(){
     ['str','dex','con','int','wis','cha'].forEach(stat => calculateModifier(stat))
 }
 
+/** 
+ * Obtém o modificador atual de uma habilidade
+ * @param {string} stat - A habilidade
+ * @return {number} O modificador como número inteiro
+*/
+
+function getModifier(stat){
+    const modText = document.getElementById(`${stat}-mod`).textContent
+    return parseInt(modText) || 0;
+}
+
+/**
+ * Atualiza o bônus de uma perícia específica
+ * Bônus = modificador da habilidade + bônus de proeficência
+ * @param {string} skillName - Nome da perícia a ser atualizada
+ */
+
+function updateSkillBonus(skillName){
+    const skill = skills.find(s => s.name === skillName);
+    const mod = getModifier(skill.stat);
+    const profBonus = parseInt(document.getElementById('prof-bonus').value) || 2;
+    const isProficient = document.querySelector(`.skill-item input[data-skill="${skillName}"]`).checked;
+
+    const total = mod + (isProficient ? profBonus : 0);
+    document.getElementById(`skill-${skillName.replace(/\s/g, '-')}`).textContent = (total >= 0 ? '+' : '') + total;
+
+    //Atualiza percepção passiva se for a perícia Percepção
+    if (skillName === 'Percepção'){
+        //updatePassivePerception()
+    }
+}
+
+// Atualiza todas as perícias
+function updateAllSkills(){
+    skills.forEach(skill => updateSkillBonus(skill.name));
+}
+
+/*
+ Atualiza todos os testes de resistência
+ Cada resistência = modificador de habilidade + bônus de proefici~encia (se proeficiente)
+*/
+
+function updateSavingThrows(){
+    ['str','dex','con','int','wis','cha'].forEach(stat =>{
+        const mod = getModifier(stat);
+        const profBonus = parseInt(document.getElementById('prof-bonus').value) || 2;
+        const isProficient = document.querySelector(`prof-${stat}`).checked;
+
+        const total = mod + (isProficient ? profBonus : 0);
+        document.getElementById(`save-${stat}`).textContent = (total >= 0 ? '+' : '') + total;
+    })
+}
+
+/*
+ Atualiza a ainiciativa baseada no modificador de Destreza
+*/
+function updateInitiative(){
+    const dexMod = getModifier('dex');
+    document.getElementById('initiative').value = dexMod;
+}
+
+/*
+ Atualiza a percepção passiva
+ Fóruma: 10 + modificador de sabedoria + bônus de proeficência (se proficiente em Percepção)
+*/
+
+function updatePassivePerception(){
+    const wisMod = getModifier('wis');
+    const profBonus = parseInt(document.getElementById('prof-bonus').value) || 2;
+    const isProficient = document.querySelector('.skill-item input[data-skill="Percepção"]')?.checked || false;
+
+    const perceptionBonus = wisMod + (isProficient ? profBonus : 0);
+    const passive = 10 + perceptionBonus;
+    document.getElementById('passive-perception').textContent = passive;
+}
+
+/* Atualiza o bônus de proeficência baseado no nível do personagem
+   Nivel 1-4: +2, 5-8: +3, 9-12: +4, 13-16: +5, 17-20: +6
+*/
+
+function updateProficiencyBonus(){
+    const level = parseInt(document.getElementById('level'),value) || 1;
+    // Garante que o nível está entre 1 e 20
+    const validLevel = Math.max(1, Math.min(20, level));
+    if (validLevel !== level){
+        document.getElementById('level').value = validLevel;
+    }
+
+    let profBonus = 2;
+    if (validLevel >= 17) profBonus = 6
+    else if (validLevel >= 13) profBonus = 5
+    else if (validLevel >= 9) profBonus = 4
+    else if (validLevel >= 5) profBonus = 3
+
+    document.getElementById('prof-bonus').value = profBonus
+}
 //#endregion
 
 //#region FUNÇÕES DE SELEÇÃO DE RAÇA E CLASSE
