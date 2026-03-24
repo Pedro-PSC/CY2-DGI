@@ -2,11 +2,11 @@
 
 // Dados das raças com seus bônus de habilidade, deslocamento e características
 const raceData = {
-    'dawrf-hill' : {
-        name: 'Anão da Colina',
-        abilityBonus: {con: 2, wis: 1}, // Anões da Colina: +2 Constituição, +1 Sabedoria
-        speed: 7.5,
-        features: 'Visão no Escuro, Resiliência Anã, Treinamento Anão em Combate, Proficiência com Ferramentas, Especialização em Rochas, Tenacidade Anã'
+    'dwarf-hill': { 
+        name: 'Anão da Colina', 
+        abilityBonus: { con: 2, wis: 1 }, // Anões da Colina: +2 Constituição, +1 Sabedoria
+        speed: 7.5, // Deslocamento base de 7.5 metros (diferente dos humanos)
+        features: 'Visão no Escuro, Resiliência Anã, Treinamento Anão em Combate, Proficiência com Ferramentas, Especialização em Rochas, Tenacidade Anã' 
     },
     'dwarf-mountain': { 
         name: 'Anão da Montanha', 
@@ -90,7 +90,7 @@ const raceData = {
 
 // Lista completa de perícias com suas habilidades associadas
 const skills = [
-    { name: 'Acrobacia', stat: 'dex'},
+    { name: 'Acrobacia', stat: 'dex' },
     { name: 'Arcanismo', stat: 'int' },
     { name: 'Atletismo', stat: 'str' },
     { name: 'Atuação', stat: 'cha' },
@@ -154,7 +154,9 @@ const subclassOptions = {
 */
 
 function init(){
-    renderSkills();
+    renderSkills(); // Cria a lista de perícias no HTML
+    calculateAllModifiers(); // Calcula todos os modificadores iniciais
+    updateProficiencyBonus(); // Atualiza o bônus de proficiência baseado no nível
 }
 //#endregion
 
@@ -163,12 +165,11 @@ function init(){
 //#endregion
 
 //#region FUNÇÕES DE RENDERIZAÇÃO
-/*
-    Renderiza a lista de perícias no conteiner HTML
-    Cria checkboxes e labels para cada perícia da lista
-*/
-
-function renderSkills(){
+/**
+ * Renderiza a lista de perícias no container HTML
+ * Cria checkboxes e labels para cada perícia da lista
+ */
+function renderSkills() {
     const container = document.getElementById('skills-container');
     container.innerHTML = '';
     skills.forEach(skill => {
@@ -179,142 +180,277 @@ function renderSkills(){
             <span class="skill-name">${skill.name} <span>(${skill.stat.toUpperCase()})</span></span>
             <span class="skill-bonus" id="skill-${skill.name.replace(/\s/g, '-')}">+0</span>
         `;
-        container.appendChild(div)
-    })
+        container.appendChild(div);
+    });
 }
 //#endregion
 
 //#region FUNÇÕES DE CÁLCULO
- /**
+/**
  * Calcula o modificador de uma habilidade baseado no valor
- * Fórmula: (valor - 10)/2, arredondado para baixo
+ * Fórmula: (valor - 10) / 2, arredondado para baixo
  * @param {string} stat - A habilidade para calcular o modificador
- * @returns {number} o modificador calculado
+ * @returns {number} O modificador calculado
  */
-
-function calculateModifier(stat){
-    const score = parentInt(document.getElementById(`${stat}-score`).value) || 10;
-    const mod = Math.floor((score -10) / 2);
+function calculateModifier(stat) {
+    const score = parseInt(document.getElementById(`${stat}-score`).value) || 10;
+    const mod = Math.floor((score - 10) / 2);
     document.getElementById(`${stat}-mod`).textContent = (mod >= 0 ? '+' : '') + mod;
-
+    
     // Atualiza tudo que depende do modificador
-    //updateAllSkills();
-    //updateSavingThrows();
-    //updateInitiative();
-    //updatePassivePerception();
-
+    updateAllSkills();
+    updateSavingThrows();
+    updateInitiative();
+    updatePassivePerception();
+    
     return mod;
 }
 
-// Calcula os modificares de todas as habilidades
-function calculateAllModifiers(){
-    ['str','dex','con','int','wis','cha'].forEach(stat => calculateModifier(stat))
+/**
+ * Calcula os modificadores de todas as habilidades
+ */
+function calculateAllModifiers() {
+    ['str', 'dex', 'con', 'int', 'wis', 'cha'].forEach(stat => calculateModifier(stat));
 }
 
-/** 
+/**
  * Obtém o modificador atual de uma habilidade
  * @param {string} stat - A habilidade
- * @return {number} O modificador como número inteiro
-*/
-
-function getModifier(stat){
-    const modText = document.getElementById(`${stat}-mod`).textContent
+ * @returns {number} O modificador como número inteiro
+ */
+function getModifier(stat) {
+    const modText = document.getElementById(`${stat}-mod`).textContent;
     return parseInt(modText) || 0;
 }
 
 /**
  * Atualiza o bônus de uma perícia específica
- * Bônus = modificador da habilidade + bônus de proeficência
+ * Bônus = modificador da habilidade + bônus de proficiência (se proficiente)
  * @param {string} skillName - Nome da perícia a ser atualizada
  */
-
-function updateSkillBonus(skillName){
+function updateSkillBonus(skillName) {
     const skill = skills.find(s => s.name === skillName);
     const mod = getModifier(skill.stat);
     const profBonus = parseInt(document.getElementById('prof-bonus').value) || 2;
     const isProficient = document.querySelector(`.skill-item input[data-skill="${skillName}"]`).checked;
-
+    
     const total = mod + (isProficient ? profBonus : 0);
     document.getElementById(`skill-${skillName.replace(/\s/g, '-')}`).textContent = (total >= 0 ? '+' : '') + total;
-
-    //Atualiza percepção passiva se for a perícia Percepção
-    if (skillName === 'Percepção'){
-        //updatePassivePerception()
+    
+    // Atualiza percepção passiva se for a perícia Percepção
+    if (skillName === 'Percepção') {
+        updatePassivePerception();
     }
 }
 
-// Atualiza todas as perícias
-function updateAllSkills(){
+/**
+ * Atualiza todas as perícias
+ */
+function updateAllSkills() {
     skills.forEach(skill => updateSkillBonus(skill.name));
 }
 
-/*
- Atualiza todos os testes de resistência
- Cada resistência = modificador de habilidade + bônus de proefici~encia (se proeficiente)
-*/
-
-function updateSavingThrows(){
-    ['str','dex','con','int','wis','cha'].forEach(stat =>{
+/**
+ * Atualiza todos os testes de resistência
+ * Cada resistência = modificador da habilidade + bônus de proficiência (se proficiente)
+ */
+function updateSavingThrows() {
+    ['str', 'dex', 'con', 'int', 'wis', 'cha'].forEach(stat => {
         const mod = getModifier(stat);
         const profBonus = parseInt(document.getElementById('prof-bonus').value) || 2;
-        const isProficient = document.querySelector(`prof-${stat}`).checked;
-
+        const isProficient = document.getElementById(`prof-${stat}`).checked;
+        
         const total = mod + (isProficient ? profBonus : 0);
         document.getElementById(`save-${stat}`).textContent = (total >= 0 ? '+' : '') + total;
-    })
+    });
 }
 
-/*
- Atualiza a ainiciativa baseada no modificador de Destreza
-*/
-function updateInitiative(){
+/**
+ * Atualiza a iniciativa baseada no modificador de Destreza
+ */
+function updateInitiative() {
     const dexMod = getModifier('dex');
     document.getElementById('initiative').value = dexMod;
 }
 
-/*
- Atualiza a percepção passiva
- Fóruma: 10 + modificador de sabedoria + bônus de proeficência (se proficiente em Percepção)
-*/
-
-function updatePassivePerception(){
+/**
+ * Atualiza a percepção passiva
+ * Fórmula: 10 + modificador de Sabedoria + bônus de proficiência (se proficiente em Percepção)
+ */
+function updatePassivePerception() {
     const wisMod = getModifier('wis');
     const profBonus = parseInt(document.getElementById('prof-bonus').value) || 2;
     const isProficient = document.querySelector('.skill-item input[data-skill="Percepção"]')?.checked || false;
-
+    
     const perceptionBonus = wisMod + (isProficient ? profBonus : 0);
     const passive = 10 + perceptionBonus;
     document.getElementById('passive-perception').textContent = passive;
 }
 
-/* Atualiza o bônus de proeficência baseado no nível do personagem
-   Nivel 1-4: +2, 5-8: +3, 9-12: +4, 13-16: +5, 17-20: +6
-*/
-
-function updateProficiencyBonus(){
-    const level = parseInt(document.getElementById('level'),value) || 1;
+/**
+ * Atualiza o bônus de proficiência baseado no nível do personagem
+ * Nível 1-4: +2, 5-8: +3, 9-12: +4, 13-16: +5, 17-20: +6
+ */
+function updateProficiencyBonus() {
+    const level = parseInt(document.getElementById('level').value) || 1;
     // Garante que o nível está entre 1 e 20
     const validLevel = Math.max(1, Math.min(20, level));
-    if (validLevel !== level){
+    if (validLevel !== level) {
         document.getElementById('level').value = validLevel;
     }
-
+    
     let profBonus = 2;
-    if (validLevel >= 17) profBonus = 6
-    else if (validLevel >= 13) profBonus = 5
-    else if (validLevel >= 9) profBonus = 4
-    else if (validLevel >= 5) profBonus = 3
-
-    document.getElementById('prof-bonus').value = profBonus
+    if (validLevel >= 17) profBonus = 6;
+    else if (validLevel >= 13) profBonus = 5;
+    else if (validLevel >= 9) profBonus = 4;
+    else if (validLevel >= 5) profBonus = 3;
+    
+    document.getElementById('prof-bonus').value = profBonus;
 }
 //#endregion
 
 //#region FUNÇÕES DE SELEÇÃO DE RAÇA E CLASSE
+/**
+ * Atualiza os bônus raciais quando uma raça é selecionada
+ * Aplica os bônus de habilidade, ajusta deslocamento e adiciona características
+ */
+function updateRaceBonuses() {
+    const race = document.getElementById('race').value;
+    if (!race) return;
 
+    const data = raceData[race];
+    
+    // Reset para valor base 10 em todas as habilidades
+    ['str', 'dex', 'con', 'int', 'wis', 'cha'].forEach(stat => {
+        document.getElementById(`${stat}-score`).value = 10;
+    });
+
+    // Aplica os bônus raciais
+    if (data.abilityBonus) {
+        Object.entries(data.abilityBonus).forEach(([stat, bonus]) => {
+            const current = parseInt(document.getElementById(`${stat}-score`).value) || 10;
+            document.getElementById(`${stat}-score`).value = current + bonus;
+        });
+    }
+
+    // Atualiza o deslocamento
+    if (data.speed) {
+        document.getElementById('speed').value = data.speed;
+    }
+
+    // Adiciona as características raciais ao campo de texto
+    const featuresArea = document.getElementById('features');
+    const currentFeatures = featuresArea.value;
+    featuresArea.value = data.features + (currentFeatures ? '\n' + currentFeatures : '');
+
+    // Recalcula tudo que foi afetado
+    calculateAllModifiers();
+}
+
+/**
+ * Atualiza as características da classe quando uma classe é selecionada
+ * Ajusta dados de vida, resistências e opções de subclasse
+ */
+function updateClassFeatures() {
+    const className = document.getElementById('class').value;
+    if (!className) return;
+
+    const data = classData[className];
+    
+    // Marca as resistências em que a classe é proficiente
+    ['str', 'dex', 'con', 'int', 'wis', 'cha'].forEach(stat => {
+        document.getElementById(`prof-${stat}`).checked = data.proficiencies[stat] || false;
+    });
+
+    // Atualiza as opções de subclasse no select
+    const subclassSelect = document.getElementById('subclass');
+    subclassSelect.innerHTML = '<option value="">Selecione</option>';
+    if (subclassOptions[className]) {
+        subclassOptions[className].forEach(sub => {
+            const option = document.createElement('option');
+            option.value = sub.toLowerCase().replace(/\s/g, '-');
+            option.textContent = sub;
+            subclassSelect.appendChild(option);
+        });
+    }
+
+    // Recalcula resistências
+    updateSavingThrows();
+}
+
+/**
+ * Atualiza as características da classe quando é selecionada
+ * Ajusta dados de vida, resistências e opções de subclasse
+ */
+
+function updateClassFeatures(){
+    const className = document.getElementById('class').value;
+    if (!className) return;
+
+    const data = classData[className];
+
+    // Marca as resistências em que a classe é proeficiente
+    ['str','dex','con','int','wis','cha'].forEach(stat => {
+        document.getElementById(`prof-${stat}`).checked = data.proficiencies[stat] || false;
+    });
+
+    // Atualiza as opções de subclasse no select
+    const subclassSelect = document.getElementById('subclass');
+    subclassSelect.innerHTML = '<option value="">Selecione</option>';
+    if (subclassOptions[className]){
+        subclassOptions[className].forEach(sub => {
+            const option = document.createElement('option');
+            option.value = sub.toLowerCase().replace(/\s/g, '-');
+            option.textContent = sub;
+            subclassSelect.appendChild(option);
+        });
+    }
+
+    // Recalcula resistências
+    updateSavingThrows();
+}
 //#endregion
 
 //#region FUNÇÕES DE UTILIZADE
-
+/**
+ * Carrega e exibe uma imagem de retrato do personagem
+ * @param {Event} event - O evento de upload de arquivo
+ */
+function loadPortrait(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const portraitDiv = document.getElementById('portrait-placeholder');
+            
+            // Remove imagem existente se houver
+            const existingImg = portraitDiv.querySelector('img');
+            if (existingImg) {
+                existingImg.remove();
+            }
+            
+            // Cria novo elemento de imagem
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'portrait-image';
+            img.alt = 'Character Portrait';
+            
+            // Adiciona imagem ao placeholder
+            portraitDiv.appendChild(img);
+            portraitDiv.classList.add('has-image');
+            
+            // Esconde o texto do placeholder
+            const span = portraitDiv.querySelector('span');
+            if (span) {
+                span.style.display = 'none';
+            }
+            
+            // Remove o background SVG
+            portraitDiv.style.backgroundImage = 'none';
+        }
+        reader.readAsDataURL(file);
+    }
+}
 //#endregion
 
 // Executa a inicialização quando a página termina de cerregar
