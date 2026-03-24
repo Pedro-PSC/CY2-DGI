@@ -157,10 +157,87 @@ function init(){
     renderSkills(); // Cria a lista de perícias no HTML
     calculateAllModifiers(); // Calcula todos os modificadores iniciais
     updateProficiencyBonus(); // Atualiza o bônus de proficiência baseado no nível
+    //loadFromLocalStorage(); // Carrega dados salvos do localStorage
+
+    // Adiciona listeners para cada habilidade detectar mudanças nos valores
+    ['str', 'dex', 'con', 'int', 'wis', 'cha'].forEach(stat => {
+        document.getElementById(`${stat}-score`).addEventListener('input', () =>{
+            calculateModifier(stat); // Recalcula o modificador da habilidade
+            updateAllSkills(); // Atualiza todas as perícias que dependem desta habilidade
+            updateSavingThrows(); // Atualiza os testes de resistência
+            updatePassivePerception(); // Atualiza a percepção passiva
+        });
+    });
+
+    // Adiciona listeners para os checkboxes de proficiência em perícias
+    document.querySelectorAll('.skill-item input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', () => {
+            updateAllSkills();
+            //autoSave();
+        });
+    });
+
+    // Listener para o campo de nível
+    document.getElementById('level').addEventListener('input', () => {
+        updateProficiencyBonus(); // Atualizando bônus de proficiência quando o nível muda
+    })
 }
 //#endregion
 
 //#region FUNÇÕES DOS BOTÕES DE AJUSTE
+/**
+ * Ajusta o valor de uma habilidade usando os botões + e -
+ * @param {string} stat - A habilidade a ser ajustada (str, dex, con, int, wis, cha)
+ * @param {number} delta - O valor a ser adicionado (positivo ou negativo)
+ */
+function adjustAbility(stat, delta) {
+    const input = document.getElementById(`${stat}-score`);
+    let value = parseInt(input.value) || 10;
+    value = Math.max(1 , Math.min(30, value + delta));// Limita entre 1 e 30
+    input.value = value;
+    calculateModifier(stat); // Recalcula o modificador
+}
+
+/**
+ * Ajusta valores de combate (CA, Deslocamento e PV Máx) usando os botões + e -
+ * @param {string} field - O campo a ser ajustado ('ac', 'speed' ou 'hp-max')
+ * @param {number} delta - O valor a ser adicionado
+ */
+
+function adjustCombat(field, delta){
+    const input = document.getElementById(field);
+    let value;
+
+    if (field === 'hp-max'){
+        value = parseInt(input.value) || 0;
+    }
+    else{
+        value = parseFloat(input.value) || 0;
+    }
+
+    value = Math.max(0, value + delta);
+
+    if (field === 'speed'){
+        // Arredonda para 1 casa decimal para deslocamento
+        input.value = Math.round(value * 10) / 10;
+    }
+    else{
+        input.value = value
+    }
+}
+
+/**
+ * Ajusta valores usando os botões empilhados (vertical)
+ * Usando para PVs e dinheiro
+ * @param {string} field - O campo a ser ajustado
+ * @param {number} delta - O valor a ser adicionado
+ */
+function adjustStacked(field,delta){
+    const input = document.getElementById(field);
+    let value = parseInt(input.value) || 0;
+    value = Math.max(0, value + delta);
+    input.value = value;
+}
 
 //#endregion
 
