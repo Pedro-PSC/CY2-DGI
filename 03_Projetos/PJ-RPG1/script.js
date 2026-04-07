@@ -144,6 +144,118 @@ const subclassOptions = {
 //#endregion
 
 //#region SALVAR E CARREGAR
+/**
+ * Coleta todos od dados da ficha e salva em um arquivo JSON
+ */
+function saveCharacter(){
+    const characterData = {
+        // Informações básicas
+        race: document.getElementById('race').value,
+        characterClass: document.getElementById('class').value,
+        subclass: document.getElementById('subclass').value,
+        level: document.getElementById('level').value,
+        characterName: document.getElementById('character-name').value,
+        playerName: document.getElementById('player-name').value,
+        background: document.getElementById('background').value,
+        alignment: document.getElementById('alignment').value,
+        xp: document.getElementById('xp').value,
+
+        //Habilidades
+        str: document.getElementById('str-score').value,
+        dex: document.getElementById('dex-score').value,
+        con: document.getElementById('con-score').value,
+        int: document.getElementById('int-score').value,
+        wis: document.getElementById('wis-score').value,
+        cha: document.getElementById('cha-score').value,
+
+        // Proficiências em resistências
+        profStr: document.getElementById('prof-str').checked,
+        profDex: document.getElementById('prof-dex').checked,
+        profCon: document.getElementById('prof-con').checked,
+        profInt: document.getElementById('prof-int').checked,
+        profWis: document.getElementById('prof-wis').checked,
+        profCha: document.getElementById('prof-cha').checked,
+
+        // Proficiências em perícias = coleta o estado de cada checkbox
+        skillProfs: {},
+
+        // Combate
+        ac: document.getElementById('ac').value,
+        speed: document.getElementById('speed').value,
+        hpMax: document.getElementById('hp-max').value,
+        hpCurrent: document.getElementById('hp-current').value,
+        hpTemp: document.getElementById('hp-temp').value,
+
+        // Death saves
+        deathSuccess1: document.getElementById('death-success-1').checked,
+        deathSuccess2: document.getElementById('death-success-2').checked,
+        deathSuccess3: document.getElementById('death-success-3').checked,
+        deathFail1: document.getElementById('death-fail-1').checked,
+        deathFail2: document.getElementById('death-fail-2').checked,
+        deathFail3: document.getElementById('death-fail-3').checked,
+
+        // Ataques
+        attack1Name: document.getElementById('attack1-name').value,
+        attack1Bonus: document.getElementById('attack1-bonus').value,
+        attack1Damage: document.getElementById('attack1-damage').value,
+        attack1Range: document.getElementById('attack1-range').value,
+        attack1Used: document.getElementById('attack1-used').checked,
+
+        attack2Name: document.getElementById('attack2-name').value,
+        attack2Bonus: document.getElementById('attack2-bonus').value,
+        attack2Damage: document.getElementById('attack2-damage').value,
+        attack2Range: document.getElementById('attack2-range').value,
+        attack2Used: document.getElementById('attack2-used').checked,
+
+        // Equipamento e dinheiro
+        equipment: document.getElementById('equipment').value,
+        cp: document.getElementById('cp').value,
+        sp: document.getElementById('sp').value,
+        ep: document.getElementById('ep').value,
+        gp: document.getElementById('gp').value,
+        pp: document.getElementById('pp').value,
+
+        // Inspiração
+        inspiration: document.getElementById('inspiration').checked,
+
+        // Idiomas e características
+        languages: document.getElementById('languages').value,
+        features: document.getElementById('features').value,
+
+        // Personalidade
+        personalityTraits: document.getElementById('personality-traits').value,
+        ideals: document.getElementById('ideals').value,
+        bonds: document.getElementById('bonds').value,
+        flaws: document.getElementById('flaws').value,
+
+        // Image (se houver)
+        portraitImage: document.getElementById('portrair-placeholder').querySelector('img')?.src || ''
+    };
+
+    // Coleta o estado de cada perícia
+    skills.forEach(skill => {
+        const checkbox = document.querySelector(`.skill-item input[data-skill="${skill.name}"]`);
+        if(checkbox){
+            characterData.skillProfs[skill.name] = checkbox.checked;
+        }
+    });
+
+    // Converte para JSON e cria o arquivo para download
+    const jsonData = JSON.stringify(characterData,null,2);
+    const blob = new Blob([jsonData], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+
+    // Cria um link para download e clina nele automaticamente
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${characterData.characterName || 'personagem'}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    alert('Personagem salvo com sucesso!');
+}
 
 //#endregion
 
