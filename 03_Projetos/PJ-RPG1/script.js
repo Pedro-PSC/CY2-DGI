@@ -257,6 +257,153 @@ function saveCharacter(){
     alert('Personagem salvo com sucesso!');
 }
 
+/**
+ * Abre o seletor de arquivos para carregar um personagem
+ */
+
+function loadCharacter(){
+    document.getElementById('load-file').click();
+}
+
+/**
+ * Carrega os dados de um arquivo JSON e preenche a ficha
+ */
+function loadFromFile(event){
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try{
+            const data = JSON.parse(e.target.result);
+
+            // PASSO 1: Carregar campos básicos que não dependem de raça/classe
+            document.getElementById('character-name').value = data.characterName || '';
+            document.getElementById('player-name').value = data.playerName || '';
+            document.getElementById('level').value = data.level || 1;
+            document.getElementById('xp').value = data.xp || 0;
+
+            // PASSO 2: Carregar raça e classe PRIMEIRO para configurar as opção
+            const raceValue = data.race || '';
+            const classValue = data.characterClass || '';
+
+            document.getElementById('race').value = raceValue;
+            document.getElementById('class').value = classValue;
+
+            // Atualiza as opções de subclasse baseado na classe
+            if (classValue){
+                updateClassFeatures();
+            }
+
+            // PASSO 3: Carregar subclase()
+            document.getElementById('subclass').value = data.subclass || '';
+
+            // PASSO 4: Carregar outros selects
+            document.getElementById('background').value = data.background || '';
+            document.getElementById('alignment').value = data.alignment || '';
+
+            // PASSO 5: Carregas resistências
+            document.getElementById('prof-str').checked = data.profStr || false;
+            document.getElementById('prof-dex').checked = data.profDex || false;
+            document.getElementById('prof-con').checked = data.profCon || false;
+            document.getElementById('prof-int').checked = data.profInt || false;
+            document.getElementById('prof-wis').checked = data.profWis || false;
+            document.getElementById('prof-cha').checked = data.profCha || false;
+
+            // PASSO 6: Carregar combate (exceto Habilidades)
+            document.getElementById('ac').value = data.ac || 10;
+            document.getElementById('speed').value = data.speed || 9;
+            document.getElementById('hp-max').value = data.hpMax || 10;
+            document.getElementById('hp-current').value = data.hpCurrent || 10;
+            document.getElementById('hp-temp').value = data.hpTemp || 10;
+
+            // PASSO 7: Carregar death saves
+            document.getElementById('death-success1').checked = data.deathSuccess1 || false;
+            document.getElementById('death-success2').checked = data.deathSuccess2 || false;
+            document.getElementById('death-success3').checked = data.deathSuccess3 || false;
+            document.getElementById('death-fail1').checked = data.deathFail1 || false;
+            document.getElementById('death-fail2').checked = data.deathFail2 || false;
+            document.getElementById('death-fail3').checked = data.deathFail3 || false;
+
+            // PASSO 8: Carregar ataques
+            document.getElementById('attack1-name').value = data.attack1Name || '';
+            document.getElementById('attack1-bonus').value = data.attack1Bonus || '+5';
+            document.getElementById('attack1-damage').value = data.attack1Damage || '1d8+3';
+            document.getElementById('attack1-range').value = data.attack1Range || '1.5m';
+            document.getElementById('attack1-used').checked = data.attack1Used || false;
+
+            document.getElementById('attack2-name').value = data.attack2Name || '';
+            document.getElementById('attack2-bonus').value = data.attack2Bonus || '+5';
+            document.getElementById('attack2-damage').value = data.attack2Damage || '1d8+3';
+            document.getElementById('attack2-range').value = data.attack2Range || '45/180m';
+            document.getElementById('attack2-used').checked = data.attack2Used || false;
+
+            // PASSO 10: Carregar inspiração
+            document.getElementById('inspiration').checked = data.inspiration || false;
+
+            // PASSO 11: Carregar idiomas e características
+            document.getElementById('languages').value = data.languages || '';
+            document.getElementById('features').value = data.features || '';
+
+            // PASSO 12: Carregar personalidade
+            document.getElementById('personality-traits').value = data.personalityTraits || '';
+            document.getElementById('ideals').value = data.ideals || '';
+            document.getElementById('bonds').value = data.bonds || '';
+            document.getElementById('flaws').value = data.flaws || '';
+
+            //PASSO 13: Carregar imagem
+            if(data.portraitImage){
+                const portraitDiv = document.getElementById('portrait-placeholder');
+                const img = document.createElement('img');
+                img.src = data.portraitImage;
+                img.className = 'portrait-image';
+                img.alt = 'Character Portrait';
+                portraitDiv.innerHTML = '';
+                portraitDiv.appendChild(img)
+                portraitDiv.classList.add('has-image');
+                portraitDiv.style.backgroundImage = 'none';
+            }
+
+            // PASSO 14: Aplicar bonus raciais (se houver raça selecionada)
+            if(raceValue){
+                updateRaceBonuses();
+            }
+
+            // PASSO 15: carregar habilades (sobrecreve os bônus raciais)
+            if (data.str) document.getElementById('str-score').value = data.str;
+            if (data.dex) document.getElementById('dex-score').value = data.dex;
+            if (data.con) document.getElementById('con-score').value = data.con;
+            if (data.int) document.getElementById('int-score').value = data.int;
+            if (data.wis) document.getElementById('wis-score').value = data.wis;
+            if (data.cha) document.getElementById('cha-score').value = data.cha;
+
+            // PASSO 16: Carregar proficiências em perícias
+            if(data.skillProfs){
+                skills.forEach(skill => {
+                    const checkbox = document.querySelector(`.skill-item input[data-skill="${skill.name}"]`);
+                    if (checkbox && data.skillProfs[skill.name] !== undefined){
+                        checkbox.checked = data.skillProfs[skill.name];
+                    }
+                })
+            }
+
+            // PASSO 17: Recalcular tudo
+            calculateAllModifiers();
+            updateProficiencyBonus();
+            updateAllSkills();
+            updateSavingThrows();
+            updatePassivePerception();
+
+            alert('Personagem carregado com sucesso!')
+        }
+        catch(error){
+            alert('Erro ao carregar o arquivo. Certifique-se de que é um arquivo JSON válido');
+            console.error(error);
+        }
+    };
+    reader.readAsText(file);
+}
+
 //#endregion
 
 //#region FUNÇÕES DE INICIALIZAÇÃO
