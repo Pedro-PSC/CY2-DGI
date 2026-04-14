@@ -144,10 +144,12 @@ const subclassOptions = {
 //#endregion
 
 //#region SALVAR E CARREGAR
+
 /**
- * Coleta todos od dados da ficha e salva em um arquivo JSON
+ * Coleta todos os dados da ficha e salva em um arquivo JSON
  */
-function saveCharacter(){
+function saveCharacter() {
+    // Cria um objeto com todos os dados da ficha
     const characterData = {
         // Informações básicas
         race: document.getElementById('race').value,
@@ -159,15 +161,15 @@ function saveCharacter(){
         background: document.getElementById('background').value,
         alignment: document.getElementById('alignment').value,
         xp: document.getElementById('xp').value,
-
-        //Habilidades
+        
+        // Habilidades
         str: document.getElementById('str-score').value,
         dex: document.getElementById('dex-score').value,
         con: document.getElementById('con-score').value,
         int: document.getElementById('int-score').value,
         wis: document.getElementById('wis-score').value,
         cha: document.getElementById('cha-score').value,
-
+        
         // Proficiências em resistências
         profStr: document.getElementById('prof-str').checked,
         profDex: document.getElementById('prof-dex').checked,
@@ -175,17 +177,17 @@ function saveCharacter(){
         profInt: document.getElementById('prof-int').checked,
         profWis: document.getElementById('prof-wis').checked,
         profCha: document.getElementById('prof-cha').checked,
-
-        // Proficiências em perícias = coleta o estado de cada checkbox
+        
+        // Proficiências em perícias - coleta o estado de cada checkbox
         skillProfs: {},
-
+        
         // Combate
         ac: document.getElementById('ac').value,
         speed: document.getElementById('speed').value,
         hpMax: document.getElementById('hp-max').value,
         hpCurrent: document.getElementById('hp-current').value,
         hpTemp: document.getElementById('hp-temp').value,
-
+        
         // Death saves
         deathSuccess1: document.getElementById('death-success-1').checked,
         deathSuccess2: document.getElementById('death-success-2').checked,
@@ -193,20 +195,20 @@ function saveCharacter(){
         deathFail1: document.getElementById('death-fail-1').checked,
         deathFail2: document.getElementById('death-fail-2').checked,
         deathFail3: document.getElementById('death-fail-3').checked,
-
+        
         // Ataques
         attack1Name: document.getElementById('attack1-name').value,
         attack1Bonus: document.getElementById('attack1-bonus').value,
         attack1Damage: document.getElementById('attack1-damage').value,
         attack1Range: document.getElementById('attack1-range').value,
         attack1Used: document.getElementById('attack1-used').checked,
-
+        
         attack2Name: document.getElementById('attack2-name').value,
         attack2Bonus: document.getElementById('attack2-bonus').value,
         attack2Damage: document.getElementById('attack2-damage').value,
         attack2Range: document.getElementById('attack2-range').value,
         attack2Used: document.getElementById('attack2-used').checked,
-
+        
         // Equipamento e dinheiro
         equipment: document.getElementById('equipment').value,
         cp: document.getElementById('cp').value,
@@ -214,38 +216,38 @@ function saveCharacter(){
         ep: document.getElementById('ep').value,
         gp: document.getElementById('gp').value,
         pp: document.getElementById('pp').value,
-
+        
         // Inspiração
         inspiration: document.getElementById('inspiration').checked,
-
+        
         // Idiomas e características
         languages: document.getElementById('languages').value,
         features: document.getElementById('features').value,
-
+        
         // Personalidade
         personalityTraits: document.getElementById('personality-traits').value,
         ideals: document.getElementById('ideals').value,
         bonds: document.getElementById('bonds').value,
         flaws: document.getElementById('flaws').value,
-
-        // Image (se houver)
-        portraitImage: document.getElementById('portrair-placeholder').querySelector('img')?.src || ''
+        
+        // Imagem (se houver)
+        portraitImage: document.getElementById('portrait-placeholder').querySelector('img')?.src || ''
     };
-
+    
     // Coleta o estado de cada perícia
     skills.forEach(skill => {
         const checkbox = document.querySelector(`.skill-item input[data-skill="${skill.name}"]`);
-        if(checkbox){
+        if (checkbox) {
             characterData.skillProfs[skill.name] = checkbox.checked;
         }
     });
-
+    
     // Converte para JSON e cria o arquivo para download
-    const jsonData = JSON.stringify(characterData,null,2);
-    const blob = new Blob([jsonData], {type: 'application/json'});
+    const jsonData = JSON.stringify(characterData, null, 2);
+    const blob = new Blob([jsonData], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-
-    // Cria um link para download e clina nele automaticamente
+    
+    // Cria um link para download e clica nele automaticamente
     const a = document.createElement('a');
     a.href = url;
     a.download = `${characterData.characterName || 'personagem'}.json`;
@@ -253,174 +255,326 @@ function saveCharacter(){
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-
+    
     alert('Personagem salvo com sucesso!');
 }
 
 /**
  * Abre o seletor de arquivos para carregar um personagem
  */
-
-function loadCharacter(){
+function loadCharacter() {
     document.getElementById('load-file').click();
 }
 
 /**
  * Carrega os dados de um arquivo JSON e preenche a ficha
  */
-function loadFromFile(event){
+function loadFromFile(event) {
     const file = event.target.files[0];
     if (!file) return;
-
+    
     const reader = new FileReader();
     reader.onload = function(e) {
-        try{
+        try {
             const data = JSON.parse(e.target.result);
-
+            
             // PASSO 1: Carregar campos básicos que não dependem de raça/classe
             document.getElementById('character-name').value = data.characterName || '';
             document.getElementById('player-name').value = data.playerName || '';
             document.getElementById('level').value = data.level || 1;
             document.getElementById('xp').value = data.xp || 0;
-
-            // PASSO 2: Carregar raça e classe PRIMEIRO para configurar as opção
+            
+            // PASSO 2: Carregar raça e classe PRIMEIRO para configurar as opções
             const raceValue = data.race || '';
             const classValue = data.characterClass || '';
-
+            
             document.getElementById('race').value = raceValue;
             document.getElementById('class').value = classValue;
-
+            
             // Atualiza as opções de subclasse baseado na classe
-            if (classValue){
+            if (classValue) {
                 updateClassFeatures();
             }
-
-            // PASSO 3: Carregar subclase()
+            
+            // PASSO 3: Carregar subclasse
             document.getElementById('subclass').value = data.subclass || '';
-
+            
             // PASSO 4: Carregar outros selects
             document.getElementById('background').value = data.background || '';
             document.getElementById('alignment').value = data.alignment || '';
-
-            // PASSO 5: Carregas resistências
+            
+            // PASSO 5: Carregar resistências
             document.getElementById('prof-str').checked = data.profStr || false;
             document.getElementById('prof-dex').checked = data.profDex || false;
             document.getElementById('prof-con').checked = data.profCon || false;
             document.getElementById('prof-int').checked = data.profInt || false;
             document.getElementById('prof-wis').checked = data.profWis || false;
             document.getElementById('prof-cha').checked = data.profCha || false;
-
-            // PASSO 6: Carregar combate (exceto Habilidades)
+            
+            // PASSO 6: Carregar combate (exceto habilidades)
             document.getElementById('ac').value = data.ac || 10;
             document.getElementById('speed').value = data.speed || 9;
             document.getElementById('hp-max').value = data.hpMax || 10;
             document.getElementById('hp-current').value = data.hpCurrent || 10;
-            document.getElementById('hp-temp').value = data.hpTemp || 10;
-
+            document.getElementById('hp-temp').value = data.hpTemp || 0;
+            
             // PASSO 7: Carregar death saves
-            document.getElementById('death-success1').checked = data.deathSuccess1 || false;
-            document.getElementById('death-success2').checked = data.deathSuccess2 || false;
-            document.getElementById('death-success3').checked = data.deathSuccess3 || false;
-            document.getElementById('death-fail1').checked = data.deathFail1 || false;
-            document.getElementById('death-fail2').checked = data.deathFail2 || false;
-            document.getElementById('death-fail3').checked = data.deathFail3 || false;
-
+            document.getElementById('death-success-1').checked = data.deathSuccess1 || false;
+            document.getElementById('death-success-2').checked = data.deathSuccess2 || false;
+            document.getElementById('death-success-3').checked = data.deathSuccess3 || false;
+            document.getElementById('death-fail-1').checked = data.deathFail1 || false;
+            document.getElementById('death-fail-2').checked = data.deathFail2 || false;
+            document.getElementById('death-fail-3').checked = data.deathFail3 || false;
+            
             // PASSO 8: Carregar ataques
             document.getElementById('attack1-name').value = data.attack1Name || '';
             document.getElementById('attack1-bonus').value = data.attack1Bonus || '+5';
             document.getElementById('attack1-damage').value = data.attack1Damage || '1d8+3';
             document.getElementById('attack1-range').value = data.attack1Range || '1.5m';
             document.getElementById('attack1-used').checked = data.attack1Used || false;
-
+            
             document.getElementById('attack2-name').value = data.attack2Name || '';
             document.getElementById('attack2-bonus').value = data.attack2Bonus || '+5';
             document.getElementById('attack2-damage').value = data.attack2Damage || '1d8+3';
             document.getElementById('attack2-range').value = data.attack2Range || '45/180m';
             document.getElementById('attack2-used').checked = data.attack2Used || false;
-
+            
+            // PASSO 9: Carregar equipamento e dinheiro
+            document.getElementById('equipment').value = data.equipment || '';
+            document.getElementById('cp').value = data.cp || 0;
+            document.getElementById('sp').value = data.sp || 0;
+            document.getElementById('ep').value = data.ep || 0;
+            document.getElementById('gp').value = data.gp || 0;
+            document.getElementById('pp').value = data.pp || 0;
+            
             // PASSO 10: Carregar inspiração
             document.getElementById('inspiration').checked = data.inspiration || false;
-
+            
             // PASSO 11: Carregar idiomas e características
             document.getElementById('languages').value = data.languages || '';
             document.getElementById('features').value = data.features || '';
-
+            
             // PASSO 12: Carregar personalidade
             document.getElementById('personality-traits').value = data.personalityTraits || '';
             document.getElementById('ideals').value = data.ideals || '';
             document.getElementById('bonds').value = data.bonds || '';
             document.getElementById('flaws').value = data.flaws || '';
-
-            //PASSO 13: Carregar imagem
-            if(data.portraitImage){
+            
+            // PASSO 13: Carregar imagem
+            if (data.portraitImage) {
                 const portraitDiv = document.getElementById('portrait-placeholder');
                 const img = document.createElement('img');
                 img.src = data.portraitImage;
                 img.className = 'portrait-image';
                 img.alt = 'Character Portrait';
                 portraitDiv.innerHTML = '';
-                portraitDiv.appendChild(img)
+                portraitDiv.appendChild(img);
                 portraitDiv.classList.add('has-image');
                 portraitDiv.style.backgroundImage = 'none';
             }
-
-            // PASSO 14: Aplicar bonus raciais (se houver raça selecionada)
-            if(raceValue){
+            
+            // PASSO 14: APLICAR BÔNUS RACIAIS (se houver raça selecionada)
+            if (raceValue) {
                 updateRaceBonuses();
             }
-
-            // PASSO 15: carregar habilades (sobrecreve os bônus raciais)
+            
+            // PASSO 15: POR ÚLTIMO - Carregar habilidades (sobrescreve os bônus raciais)
             if (data.str) document.getElementById('str-score').value = data.str;
             if (data.dex) document.getElementById('dex-score').value = data.dex;
             if (data.con) document.getElementById('con-score').value = data.con;
             if (data.int) document.getElementById('int-score').value = data.int;
             if (data.wis) document.getElementById('wis-score').value = data.wis;
             if (data.cha) document.getElementById('cha-score').value = data.cha;
-
+            
             // PASSO 16: Carregar proficiências em perícias
-            if(data.skillProfs){
+            if (data.skillProfs) {
                 skills.forEach(skill => {
                     const checkbox = document.querySelector(`.skill-item input[data-skill="${skill.name}"]`);
-                    if (checkbox && data.skillProfs[skill.name] !== undefined){
+                    if (checkbox && data.skillProfs[skill.name] !== undefined) {
                         checkbox.checked = data.skillProfs[skill.name];
                     }
-                })
+                });
             }
-
-            // PASSO 17: Recalcular tudo
+            
+            // PASSO 17: Recalcula tudo
             calculateAllModifiers();
             updateProficiencyBonus();
             updateAllSkills();
             updateSavingThrows();
             updatePassivePerception();
-
-            alert('Personagem carregado com sucesso!')
-        }
-        catch(error){
-            alert('Erro ao carregar o arquivo. Certifique-se de que é um arquivo JSON válido');
+            
+            alert('Personagem carregado com sucesso!');
+        } catch (error) {
+            alert('Erro ao carregar o arquivo. Certifique-se de que é um arquivo JSON válido.');
             console.error(error);
         }
     };
     reader.readAsText(file);
 }
 
+/**
+ * Função chamada automaticamente após qualquer alteração para salvar no localStorage
+ */
+function autoSave() {
+    try {
+        const characterData = {
+            race: document.getElementById('race').value,
+            characterClass: document.getElementById('class').value,
+            subclass: document.getElementById('subclass').value,
+            level: document.getElementById('level').value,
+            characterName: document.getElementById('character-name').value,
+            playerName: document.getElementById('player-name').value,
+            background: document.getElementById('background').value,
+            alignment: document.getElementById('alignment').value,
+            xp: document.getElementById('xp').value,
+            str: document.getElementById('str-score').value,
+            dex: document.getElementById('dex-score').value,
+            con: document.getElementById('con-score').value,
+            int: document.getElementById('int-score').value,
+            wis: document.getElementById('wis-score').value,
+            cha: document.getElementById('cha-score').value,
+            profStr: document.getElementById('prof-str').checked,
+            profDex: document.getElementById('prof-dex').checked,
+            profCon: document.getElementById('prof-con').checked,
+            profInt: document.getElementById('prof-int').checked,
+            profWis: document.getElementById('prof-wis').checked,
+            profCha: document.getElementById('prof-cha').checked,
+            ac: document.getElementById('ac').value,
+            speed: document.getElementById('speed').value,
+            hpMax: document.getElementById('hp-max').value,
+            hpCurrent: document.getElementById('hp-current').value,
+            hpTemp: document.getElementById('hp-temp').value,
+            deathSuccess1: document.getElementById('death-success-1').checked,
+            deathSuccess2: document.getElementById('death-success-2').checked,
+            deathSuccess3: document.getElementById('death-success-3').checked,
+            deathFail1: document.getElementById('death-fail-1').checked,
+            deathFail2: document.getElementById('death-fail-2').checked,
+            deathFail3: document.getElementById('death-fail-3').checked,
+            inspiration: document.getElementById('inspiration').checked,
+            languages: document.getElementById('languages').value,
+            features: document.getElementById('features').value,
+            personalityTraits: document.getElementById('personality-traits').value,
+            ideals: document.getElementById('ideals').value,
+            bonds: document.getElementById('bonds').value,
+            flaws: document.getElementById('flaws').value,
+            equipment: document.getElementById('equipment').value,
+            cp: document.getElementById('cp').value,
+            sp: document.getElementById('sp').value,
+            ep: document.getElementById('ep').value,
+            gp: document.getElementById('gp').value,
+            pp: document.getElementById('pp').value
+        };
+        
+        localStorage.setItem('dndCharacter', JSON.stringify(characterData));
+    } catch (error) {
+        console.error('Erro ao salvar automaticamente:', error);
+    }
+}
+
+/**
+ * Carrega os dados do localStorage ao iniciar a página
+ */
+function loadFromLocalStorage() {
+    try {
+        const savedData = localStorage.getItem('dndCharacter');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            
+            // Preenche os campos básicos
+            document.getElementById('race').value = data.race || '';
+            document.getElementById('class').value = data.characterClass || '';
+            
+            if (data.characterClass) {
+                updateClassFeatures();
+                document.getElementById('subclass').value = data.subclass || '';
+            }
+            
+            document.getElementById('level').value = data.level || 1;
+            document.getElementById('character-name').value = data.characterName || '';
+            document.getElementById('player-name').value = data.playerName || '';
+            document.getElementById('background').value = data.background || '';
+            document.getElementById('alignment').value = data.alignment || '';
+            document.getElementById('xp').value = data.xp || 0;
+            
+            // Habilidades
+            document.getElementById('str-score').value = data.str || 10;
+            document.getElementById('dex-score').value = data.dex || 10;
+            document.getElementById('con-score').value = data.con || 10;
+            document.getElementById('int-score').value = data.int || 10;
+            document.getElementById('wis-score').value = data.wis || 10;
+            document.getElementById('cha-score').value = data.cha || 10;
+            
+            // Proficiências em resistências
+            document.getElementById('prof-str').checked = data.profStr || false;
+            document.getElementById('prof-dex').checked = data.profDex || false;
+            document.getElementById('prof-con').checked = data.profCon || false;
+            document.getElementById('prof-int').checked = data.profInt || false;
+            document.getElementById('prof-wis').checked = data.profWis || false;
+            document.getElementById('prof-cha').checked = data.profCha || false;
+            
+            // Combate
+            document.getElementById('ac').value = data.ac || 10;
+            document.getElementById('speed').value = data.speed || 9;
+            document.getElementById('hp-max').value = data.hpMax || 10;
+            document.getElementById('hp-current').value = data.hpCurrent || 10;
+            document.getElementById('hp-temp').value = data.hpTemp || 0;
+            
+            // Death saves
+            document.getElementById('death-success-1').checked = data.deathSuccess1 || false;
+            document.getElementById('death-success-2').checked = data.deathSuccess2 || false;
+            document.getElementById('death-success-3').checked = data.deathSuccess3 || false;
+            document.getElementById('death-fail-1').checked = data.deathFail1 || false;
+            document.getElementById('death-fail-2').checked = data.deathFail2 || false;
+            document.getElementById('death-fail-3').checked = data.deathFail3 || false;
+            
+            // Inspiração
+            document.getElementById('inspiration').checked = data.inspiration || false;
+            
+            // Textareas
+            document.getElementById('languages').value = data.languages || '';
+            document.getElementById('features').value = data.features || '';
+            document.getElementById('personality-traits').value = data.personalityTraits || '';
+            document.getElementById('ideals').value = data.ideals || '';
+            document.getElementById('bonds').value = data.bonds || '';
+            document.getElementById('flaws').value = data.flaws || '';
+            document.getElementById('equipment').value = data.equipment || '';
+            
+            // Dinheiro
+            document.getElementById('cp').value = data.cp || 0;
+            document.getElementById('sp').value = data.sp || 0;
+            document.getElementById('ep').value = data.ep || 0;
+            document.getElementById('gp').value = data.gp || 0;
+            document.getElementById('pp').value = data.pp || 0;
+            
+            // Recalcula tudo
+            if (data.race) updateRaceBonuses();
+            calculateAllModifiers();
+            updateProficiencyBonus();
+            updateAllSkills();
+            updateSavingThrows();
+            updatePassivePerception();
+        }
+    } catch (error) {
+        console.error('Erro ao carregar do localStorage:', error);
+    }
+}
 //#endregion
 
 //#region FUNÇÕES DE INICIALIZAÇÃO
-/*
- Função principal de inicialização - executada quando a página carrega
- Configura todos os listeners e renderiza os componente inicias
-*/
 
-function init(){
+/**
+ * Função principal de inicialização - executada quando a página carrega
+ * Configura todos os listeners e renderiza os componentes iniciais
+ */
+function init() {
     renderSkills(); // Cria a lista de perícias no HTML
     calculateAllModifiers(); // Calcula todos os modificadores iniciais
     updateProficiencyBonus(); // Atualiza o bônus de proficiência baseado no nível
-    //loadFromLocalStorage(); // Carrega dados salvos do localStorage
-
+    loadFromLocalStorage(); // Carrega dados salvos do localStorage
+    
     // Adiciona listeners para cada habilidade detectar mudanças nos valores
     ['str', 'dex', 'con', 'int', 'wis', 'cha'].forEach(stat => {
-        document.getElementById(`${stat}-score`).addEventListener('input', () =>{
+        document.getElementById(`${stat}-score`).addEventListener('input', () => {
             calculateModifier(stat); // Recalcula o modificador da habilidade
             updateAllSkills(); // Atualiza todas as perícias que dependem desta habilidade
             updateSavingThrows(); // Atualiza os testes de resistência
@@ -432,18 +586,19 @@ function init(){
     document.querySelectorAll('.skill-item input[type="checkbox"]').forEach(cb => {
         cb.addEventListener('change', () => {
             updateAllSkills();
-            //autoSave();
+            autoSave();
         });
     });
 
     // Listener para o campo de nível
     document.getElementById('level').addEventListener('input', () => {
-        updateProficiencyBonus(); // Atualizando bônus de proficiência quando o nível muda
-    })
+        updateProficiencyBonus(); // Atualiza bônus de proficiência quando o nível muda
+    });
 }
 //#endregion
 
 //#region FUNÇÕES DOS BOTÕES DE AJUSTE
+
 /**
  * Ajusta o valor de uma habilidade usando os botões + e -
  * @param {string} stat - A habilidade a ser ajustada (str, dex, con, int, wis, cha)
@@ -452,55 +607,53 @@ function init(){
 function adjustAbility(stat, delta) {
     const input = document.getElementById(`${stat}-score`);
     let value = parseInt(input.value) || 10;
-    value = Math.max(1 , Math.min(30, value + delta));// Limita entre 1 e 30
+    value = Math.max(1, Math.min(30, value + delta)); // Limita entre 1 e 30
     input.value = value;
     calculateModifier(stat); // Recalcula o modificador
 }
 
 /**
  * Ajusta valores de combate (CA, Deslocamento e PV Máx) usando os botões + e -
- * @param {string} field - O campo a ser ajustado ('ac', 'speed' ou 'hp-max')
+ * @param {string} field - O campo a ser ajustado ('ac', 'speed', ou 'hp-max')
  * @param {number} delta - O valor a ser adicionado
  */
-
-function adjustCombat(field, delta){
+function adjustCombat(field, delta) {
     const input = document.getElementById(field);
     let value;
-
-    if (field === 'hp-max'){
+    
+    if (field === 'hp-max') {
+        // PV Máx é texto, mas vamos tratar como número para os botões
         value = parseInt(input.value) || 0;
-    }
-    else{
+    } else {
         value = parseFloat(input.value) || 0;
     }
-
+    
     value = Math.max(0, value + delta);
-
-    if (field === 'speed'){
+    
+    if (field === 'speed') {
         // Arredonda para 1 casa decimal para deslocamento
         input.value = Math.round(value * 10) / 10;
-    }
-    else{
-        input.value = value
+    } else {
+        input.value = value;
     }
 }
 
 /**
  * Ajusta valores usando os botões empilhados (vertical)
- * Usando para PVs e dinheiro
+ * Usado para PVs e dinheiro
  * @param {string} field - O campo a ser ajustado
  * @param {number} delta - O valor a ser adicionado
  */
-function adjustStacked(field,delta){
+function adjustStacked(field, delta) {
     const input = document.getElementById(field);
     let value = parseInt(input.value) || 0;
-    value = Math.max(0, value + delta);
+    value = Math.max(0, value + delta); // Não permite valores negativos
     input.value = value;
 }
-
 //#endregion
 
 //#region FUNÇÕES DE RENDERIZAÇÃO
+
 /**
  * Renderiza a lista de perícias no container HTML
  * Cria checkboxes e labels para cada perícia da lista
@@ -522,6 +675,7 @@ function renderSkills() {
 //#endregion
 
 //#region FUNÇÕES DE CÁLCULO
+
 /**
  * Calcula o modificador de uma habilidade baseado no valor
  * Fórmula: (valor - 10) / 2, arredondado para baixo
@@ -646,6 +800,7 @@ function updateProficiencyBonus() {
 //#endregion
 
 //#region FUNÇÕES DE SELEÇÃO DE RAÇA E CLASSE
+
 /**
  * Atualiza os bônus raciais quando uma raça é selecionada
  * Aplica os bônus de habilidade, ajusta deslocamento e adiciona características
@@ -713,41 +868,10 @@ function updateClassFeatures() {
     // Recalcula resistências
     updateSavingThrows();
 }
-
-/**
- * Atualiza as características da classe quando é selecionada
- * Ajusta dados de vida, resistências e opções de subclasse
- */
-
-function updateClassFeatures(){
-    const className = document.getElementById('class').value;
-    if (!className) return;
-
-    const data = classData[className];
-
-    // Marca as resistências em que a classe é proeficiente
-    ['str','dex','con','int','wis','cha'].forEach(stat => {
-        document.getElementById(`prof-${stat}`).checked = data.proficiencies[stat] || false;
-    });
-
-    // Atualiza as opções de subclasse no select
-    const subclassSelect = document.getElementById('subclass');
-    subclassSelect.innerHTML = '<option value="">Selecione</option>';
-    if (subclassOptions[className]){
-        subclassOptions[className].forEach(sub => {
-            const option = document.createElement('option');
-            option.value = sub.toLowerCase().replace(/\s/g, '-');
-            option.textContent = sub;
-            subclassSelect.appendChild(option);
-        });
-    }
-
-    // Recalcula resistências
-    updateSavingThrows();
-}
 //#endregion
 
-//#region FUNÇÕES DE UTILIZADE
+//#region FUNÇÕES DE UTILIDADE
+
 /**
  * Carrega e exibe uma imagem de retrato do personagem
  * @param {Event} event - O evento de upload de arquivo
@@ -788,6 +912,5 @@ function loadPortrait(event) {
     }
 }
 //#endregion
-
-// Executa a inicialização quando a página termina de cerregar
+// Executa a inicialização quando a página termina de carregar
 document.addEventListener('DOMContentLoaded', init);
